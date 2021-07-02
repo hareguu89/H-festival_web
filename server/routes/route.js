@@ -2,8 +2,10 @@ const express = require("express");
 const router = express.Router();
 module.exports = router;
 
-const { ImageUpload, Test } = require("../controller");
+const { Dealers, ImageUpload, Test } = require("../controller");
 
-router.post("/dealers", ImageUpload.uploadImageToS3);
+router.post("/imgUpload", ImageUpload.uploadImageToS3);
+
+router.post("/dealers", Dealers.post);
 
 router.get("/test", Test.get);

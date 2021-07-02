@@ -16,8 +16,6 @@ module.exports = {
           region: req.body.region,
           country: req.body.country,
           sex: req.body.sex,
-          mediaDest: req.body.mediaDest,
-          description: req.body.description,
         },
       })
       .then((data) => {

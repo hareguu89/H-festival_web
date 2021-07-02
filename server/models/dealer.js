@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       imgsrc: DataTypes.STRING,
       region: DataTypes.STRING(30),
       country: DataTypes.STRING(30),
-      sex: DataTypes.BOOLEAN,
+      sex: DataTypes.STRING(30),
       mediaDest: DataTypes.STRING,
       description: DataTypes.STRING,
     },
