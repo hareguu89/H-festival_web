@@ -1,6 +1,6 @@
-import React from 'react';
-import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
-import HomePage from './pages/HomePage';
+import React from "react";
+import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
+import HomePage from "./pages/HomePage";
 
 function App(): JSX.Element {
   return (
