@@ -48,7 +48,7 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
         await axios
           .post("http://localhost:4000/imgUpload", data, {
             headers: { "Content-Type": "multipart/form-data;" },
-          })
+          },)
           .then((result) => {
             if (result.data.location) {
               setImageFile(result.data.location);
@@ -57,6 +57,8 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
       }
     }
   };
+
+  
 
   const submitHandle = async (data: FormData) => {
     let body = {
@@ -68,6 +70,7 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
       picture: imageFile,
       sex: data.sex,
     };
+
     await axios.post("http://localhost:4000/dealers", body).then((result) => {
       console.log(result);
       if (result.data === "완료.") {
@@ -75,6 +78,12 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
       }
     });
   };
+
+  // const test1 = async () => {
+  //   await axios.get("http://localhost:4000/dealers").then(data => {
+  //     console.log(data);
+  //   })
+  // }
 
   return (
     <>
@@ -211,6 +220,9 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
           <Button>Register</Button>
         </ButtonBox>
       </form>
+      {/* <ButtonBox>
+          <Button onClick={test1}>Register</Button>
+      </ButtonBox> */}
     </>
   );
 };

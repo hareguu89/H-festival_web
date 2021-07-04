@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
+import Progress from './Progress'
 axios.defaults.withCredentials = true;
 
 type FormData = {
@@ -15,21 +16,21 @@ const Detail = (): JSX.Element => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
+  const [uploadPercentage, setUploadPercentage] = useState<number>(0);
+  const [message, setMessage] = useState('');
+  const [uploadedFile, setUploadedFile] = useState({});
 
   const [mediaFile, setMediaFile] = useState<any>();
 
-  const [percentage, setPercentatge] = useState<Number>(0);
-
-  const [bIsError, setbIsError] = useState(false);
-
   const MediaHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
+      
       let fileSize = event.target.files[0].size;
-
+      
       if (fileSize > 5000000) {
-        setbIsError(true);
+        // setbIsError(true);
+        setMessage("Your image must be smaller than 500MB ");
       } else {
-        setbIsError(false);
         setMediaFile(event.target.files[0]);
         const data = new FormData();
         data.append(
@@ -37,24 +38,41 @@ const Detail = (): JSX.Element => {
           event.target.files[0],
           event.target.files[0].name,
         );
+        
 
-        await axios
-          .post("http://localhost:4000/imgUpload", data, {
-            headers: { "Content-Type": "multipart/form-data;" },
-            onUploadProgress(progressEvent: any) {
-              const { loaded, total } = progressEvent;
-              let percentage = Math.floor((loaded * 100) / total);
-              console.log(`${percentage} kb of ${total} | ${percentage}%`);
+        try {
+          const res = await axios.post('http://localhost:4000/mediaPost', data, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
             },
-          })
-          .then((result) => {
-            if (result.data.location) {
-              setMediaFile(result.data.location);
+            onUploadProgress: progressEvent => {
+              let a = Number(progressEvent.loaded) * 100;
+              let percentage = Math.round(a / progressEvent.total)
+              setUploadPercentage(
+                parseInt(String(percentage)));
             }
           });
+          
+          // Clear percentage
+          setTimeout(() => setUploadPercentage(0), 10000);
+    
+          const { fileName, filePath } = res.data;
+    
+          setUploadedFile({ fileName, filePath });
+    
+          setMessage('File Uploaded');
+        } catch (err) {
+          if (err.response.status === 500) {
+            setMessage('There was a problem with the server');
+          } else {
+            setMessage(err.response.data.msg);
+          }
+          setUploadPercentage(0);
+        }
       }
     }
   };
+  
 
   const submitHandle = async (data: FormData) => {
     console.log(data);
@@ -82,12 +100,13 @@ const Detail = (): JSX.Element => {
               formEncType="multipart/form-data"
               type="file"
               id="fileUpload"
-              accept="video/*"
+              // accept="video/*"
               onChange={(e) => MediaHandler(e)}
             />
           </InputImage>
+          <Progress percentage={uploadPercentage} />
           <Error>
-            {bIsError ? "Your image must be smaller than 10MB " : null}
+            {message}
           </Error>
         </Content>
         <CheckBox>
@@ -145,6 +164,7 @@ const Detail = (): JSX.Element => {
           <Button>Submit</Button>
         </ButtonBox>
       </Form>
+      {/* <FileUpload/> */}
     </Body>
   );
 };

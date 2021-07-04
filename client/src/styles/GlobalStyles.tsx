@@ -20,6 +20,7 @@ const globalStyles = createGlobalStyle`
         color: white;
         background-color: white;
         background-image: url(${mainImg});
+        
     }
     input{
         font-size: 16px;
@@ -27,7 +28,8 @@ const globalStyles = createGlobalStyle`
         color: white;
         border: solid 1px white;
         border-radius: 6px;
-        background-color: rgba(0, 0, 0, 0)
+        background-color: rgba(0, 0, 0, 0);
+        background-repeat: none;
     }
     input:focus{
         outline: none;
