@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
-import Progress from './Progress'
+import { Line } from "rc-progress";
 axios.defaults.withCredentials = true;
 
 type FormData = {
@@ -10,80 +11,105 @@ type FormData = {
   Description: string;
 };
 
-const Detail = (): JSX.Element => {
+interface info {
+  userInfo: {
+    fullname: string;
+    email: string;
+    mobile: string;
+    picture: string;
+    region: string;
+    country: string;
+    sex: string;
+  };
+  setbIsEnd: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
   const [uploadPercentage, setUploadPercentage] = useState<number>(0);
-  const [message, setMessage] = useState('');
-  const [uploadedFile, setUploadedFile] = useState({});
-
-  const [mediaFile, setMediaFile] = useState<any>();
+  const [message, setMessage] = useState("");
+  const [uploadedFile, setUploadedFile] = useState<string>();
+  const [bIsUpload, setbIsUpload] = useState<boolean>(false);
+  const history = useHistory();
 
   const MediaHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      
       let fileSize = event.target.files[0].size;
-      
-      if (fileSize > 5000000) {
-        // setbIsError(true);
+
+      console.log(fileSize);
+
+      if (fileSize > 524288000) {
         setMessage("Your image must be smaller than 500MB ");
+        return;
       } else {
-        setMediaFile(event.target.files[0]);
+        setbIsUpload(true);
         const data = new FormData();
         data.append(
-          "Video File",
+          "profileImage",
           event.target.files[0],
           event.target.files[0].name,
         );
-        
 
-        try {
-          const res = await axios.post('http://localhost:4000/mediaPost', data, {
+        await axios
+          .post("http://localhost:4000/mediaPost", data, {
             headers: {
-              'Content-Type': 'multipart/form-data'
+              "Content-Type": "multipart/form-data",
             },
-            onUploadProgress: progressEvent => {
+            onUploadProgress: (progressEvent) => {
               let a = Number(progressEvent.loaded) * 100;
-              let percentage = Math.round(a / progressEvent.total)
-              setUploadPercentage(
-                parseInt(String(percentage)));
+              let percentage = Math.round(a / progressEvent.total);
+              setUploadPercentage(parseInt(String(percentage)));
+            },
+          })
+          .then((res) => {
+            setTimeout(() => setUploadPercentage(0), 10000);
+
+            console.log(res);
+
+            const { location } = res.data;
+
+            setUploadedFile(location);
+
+            setMessage("File Uploaded");
+          })
+          .catch((error) => {
+            if (error.response.status === 500) {
+              setMessage("There was a problem with the server");
+            } else {
+              setMessage(error.response.data.msg);
             }
+            setUploadPercentage(0);
           });
-          
-          // Clear percentage
-          setTimeout(() => setUploadPercentage(0), 10000);
-    
-          const { fileName, filePath } = res.data;
-    
-          setUploadedFile({ fileName, filePath });
-    
-          setMessage('File Uploaded');
-        } catch (err) {
-          if (err.response.status === 500) {
-            setMessage('There was a problem with the server');
-          } else {
-            setMessage(err.response.data.msg);
-          }
-          setUploadPercentage(0);
-        }
       }
     }
+    setbIsUpload(false);
   };
-  
 
   const submitHandle = async (data: FormData) => {
-    console.log(data);
+    // console.log(data);
     let body = {
-      mediaDest: mediaFile,
-      Description: data.Description,
+      fullname: userInfo.fullname,
+      email: userInfo.email,
+      mobile: userInfo.mobile,
+      picture: userInfo.picture,
+      region: userInfo.region,
+      country: userInfo.country,
+      sex: userInfo.sex,
+      mediaDest: uploadedFile,
+      description: data.Description,
       selectedDest: data.selectedDestination,
     };
 
+    console.log("바디 : ", body);
+
     await axios.post("http://localhost:4000/dealers", body).then((result) => {
-      console.log(result);
+      if (result.data === "완료.") {
+        setbIsEnd(true);
+      }
     });
   };
 
@@ -100,46 +126,64 @@ const Detail = (): JSX.Element => {
               formEncType="multipart/form-data"
               type="file"
               id="fileUpload"
-              // accept="video/*"
+              accept="video/*"
               onChange={(e) => MediaHandler(e)}
             />
           </InputImage>
-          <Progress percentage={uploadPercentage} />
-          <Error>
-            {message}
-          </Error>
+          {bIsUpload ? (
+            <ProgressContainer>
+              <Line
+                percent={uploadPercentage}
+                strokeWidth={4}
+                strokeColor="white"
+                trailColor="none"
+              />
+            </ProgressContainer>
+          ) : null}
+          <Error>{message}</Error>
         </Content>
+
         <CheckBox>
-          <div>
-            <LabelCheck htmlFor="story">
-              <span>H-Story</span>
-            </LabelCheck>
+          <LabelCheck>
+            <span>H-Story</span>
+          </LabelCheck>
+          <LabelCheck className="box-radio-input">
             <Input
               type="radio"
               id="story"
               value="H-Story"
               {...register("selectedDestination", { required: true })}
-            />
-            <LabelCheck htmlFor="H-Travel">
-              <span>H-Travel</span>
-            </LabelCheck>
+            ></Input>
+            <span></span>
+          </LabelCheck>
+
+          <LabelCheck>
+            <span>H-Travel</span>
+          </LabelCheck>
+          <LabelCheck className="box-radio-input">
             <Input
               type="radio"
-              id="H-Travel"
+              id="story"
               value="H-Travel"
               {...register("selectedDestination", { required: true })}
-            />
-            <LabelCheck htmlFor="H-Gather">
-              <span>H-Gather</span>
-            </LabelCheck>
+            ></Input>
+            <span></span>
+          </LabelCheck>
+
+          <LabelCheck>
+            <span>H-Gather</span>
+          </LabelCheck>
+          <LabelCheck className="box-radio-input">
             <Input
               type="radio"
-              id="H-Gather"
+              id="story"
               value="H-Gather"
               {...register("selectedDestination", { required: true })}
-            />
-          </div>
+            ></Input>
+            <span></span>
+          </LabelCheck>
         </CheckBox>
+
         <Error>
           {errors.selectedDestination?.type === "required" &&
             "Please tick one of these locations."}
@@ -210,7 +254,10 @@ const LabelCheck = styled.label`
 
 const CheckBox = styled.div`
   display: flex;
+  align-items: center;
+  gap: 10px;
   width: 550px;
+  margin-bottom: 10px;
 `;
 
 const Error = styled.div`
@@ -252,4 +299,13 @@ const Button = styled.button`
   border-radius: 6px;
   background-color: rgba(0, 0, 0, 0);
   cursor: pointer;
+`;
+
+const ProgressContainer = styled.div`
+  display: flex;
+  width: 550px;
+  height: 23px;
+  border: 1px solid white;
+  border-radius: 15px;
+  align-items: center;
 `;

@@ -15,10 +15,11 @@ type FormData = {
 };
 
 interface Iprops {
+  setUserInfo: React.Dispatch<React.SetStateAction<FormData>>;
   setbIsUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
+const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
   const {
     register,
     handleSubmit,
@@ -34,11 +35,10 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
     if (event.target.files) {
       let fileSize = event.target.files[0].size;
 
-      if (fileSize > 100000) {
+      if (fileSize > 52428800) {
         setbIsError(true);
       } else {
         setbIsError(false);
-        setImageFile(event.target.files[0]);
         const data = new FormData();
         data.append(
           "profileImage",
@@ -48,7 +48,7 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
         await axios
           .post("http://localhost:4000/imgUpload", data, {
             headers: { "Content-Type": "multipart/form-data;" },
-          },)
+          })
           .then((result) => {
             if (result.data.location) {
               setImageFile(result.data.location);
@@ -58,10 +58,8 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
     }
   };
 
-  
-
   const submitHandle = async (data: FormData) => {
-    let body = {
+    setUserInfo({
       fullname: data.fullname,
       email: data.email,
       mobile: data.mobile,
@@ -69,21 +67,17 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
       country: data.country,
       picture: imageFile,
       sex: data.sex,
-    };
-
-    await axios.post("http://localhost:4000/dealers", body).then((result) => {
-      console.log(result);
-      if (result.data === "완료.") {
-        setbIsUpdate(false);
-      }
     });
-  };
 
-  // const test1 = async () => {
-  //   await axios.get("http://localhost:4000/dealers").then(data => {
-  //     console.log(data);
-  //   })
-  // }
+    setbIsUpdate(false);
+
+    // await axios.post("http://localhost:4000/dealers", body).then((result) => {
+    //   console.log(result);
+    //   if (result.data === "완료.") {
+    //     setbIsUpdate(false);
+    //   }
+    // });
+  };
 
   return (
     <>
@@ -96,7 +90,7 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
               id="fname"
               {...register("fullname", {
                 required: true,
-                minLength: 3,
+                minLength: 2,
                 maxLength: 20,
               })}
             />
@@ -120,7 +114,8 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
             <Error>
               {(errors.email?.type === "pattern" &&
                 "You have entered an invalid e-mail address. Please try again.") ||
-                (errors.email?.type === "required" && "email is required")}
+                (errors.email?.type === "required" &&
+                  "Email address is required.")}
             </Error>
           </Content>
 
@@ -138,7 +133,8 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
             <Error>
               {(errors.mobile?.type === "minLength" &&
                 "Your mobile number is too short. Please check again") ||
-                (errors.mobile?.type === "required" && "mobile is required")}
+                (errors.mobile?.type === "required" &&
+                  "Mobile number is required.")}
             </Error>
           </Content>
 
@@ -157,7 +153,7 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
               />
             </InputImage>
             <Error>
-              {bIsError ? "Your image must be smaller than 10MB " : null}
+              {bIsError ? "Your image must be smaller than 50MB " : null}
             </Error>
           </Content>
           <Content>
@@ -172,7 +168,7 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
               <option value="goldfish">Goldfish</option>
             </Selection>
             <Error>
-              {errors.region?.type === "required" && "region is required"}
+              {errors.region?.type === "required" && "Please select options."}
             </Error>
           </Content>
           <Content>
@@ -187,42 +183,44 @@ const Home = ({ setbIsUpdate }: Iprops): JSX.Element => {
               <option value="goldfish">Goldfish</option>
             </Selection>
             <Error>
-              {errors.country?.type === "required" && "country is required"}
+              {errors.country?.type === "required" && "Please select options."}
             </Error>
           </Content>
         </Body>
         <CheckBox>
-          <div>
-            <LabelCheck htmlFor="Male">
-              <span>Male</span>
-            </LabelCheck>
+          <LabelCheck htmlFor="Male">
+            <span>Male</span>
+          </LabelCheck>
+          <LabelCheck className="box-radio-input">
             <Input
               type="radio"
               id="Male"
               value="Male"
               {...register("sex", { required: true })}
-            />
-            <LabelCheck htmlFor="Female">
-              <span>Female</span>
-            </LabelCheck>
+            ></Input>
+            <span></span>
+          </LabelCheck>
+
+          <LabelCheck htmlFor="Female">
+            <span>Female</span>
+          </LabelCheck>
+          <LabelCheck className="box-radio-input">
             <Input
               type="radio"
               id="Female"
               value="Female"
               {...register("sex", { required: true })}
-            />
-          </div>
+            ></Input>
+            <span></span>
+          </LabelCheck>
         </CheckBox>
         <Error>
-          {errors.sex?.type === "required" && "Please check you Gender"}
+          {errors.sex?.type === "required" && "Please check your Gender."}
         </Error>
         <ButtonBox>
-          <Button>Register</Button>
+          <Button>Next</Button>
         </ButtonBox>
       </form>
-      {/* <ButtonBox>
-          <Button onClick={test1}>Register</Button>
-      </ButtonBox> */}
     </>
   );
 };
@@ -236,6 +234,7 @@ const Content = styled.div`
 `;
 
 const Error = styled.div`
+  margin-top: -2px;
   font-size: 12px;
   color: orange;
 `;
@@ -259,8 +258,10 @@ const Button = styled.button`
 
 const CheckBox = styled.div`
   display: flex;
+  align-items: center;
+  gap: 10px;
   width: 550px;
-  margin-bottom: 10px;
+  margin-top: 15px;
 `;
 
 const Label = styled.label<{ size?: string; width?: string }>`

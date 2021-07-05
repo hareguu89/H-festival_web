@@ -5,20 +5,24 @@ const Op = sequelize.Op;
 
 module.exports = {
   get: async (req, res) => {
-    await dealer.findAll({}).then(data => {
+    await dealer.findAll({}).then((data) => {
       res.status(200).json(data);
-    })
+    });
   },
   post: async (req, res) => {
+    console.log(req.body);
     await dealer
       .create({
-          name: req.body.fullname,
-          email: req.body.email,
-          mobile: req.body.mobile,
-          imgsrc: req.body.picture,
-          region: req.body.region,
-          country: req.body.country,
-          sex: req.body.sex,
+        name: req.body.fullname,
+        email: req.body.email,
+        mobile: req.body.mobile,
+        imgsrc: req.body.picture,
+        region: req.body.region,
+        country: req.body.country,
+        sex: req.body.sex,
+        mediaDest: req.body.mediaDest,
+        selectedDest: req.body.selectedDest,
+        description: req.body.description,
       })
       .then((data) => {
         if (data) {
