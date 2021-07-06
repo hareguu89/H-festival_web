@@ -38,7 +38,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "*"],
     credentials: true,
     methods: ["GET", "POST", "OPTIONS"],
   })
@@ -46,6 +46,10 @@ app.use(
 
 app.use(cookieParser());
 app.use("/", router);
+
+router.get("/", function (req, res) {
+  res.status(200).json("Hello World!");
+});
 
 const HTTP_PORT = process.env.HTTP_PORT || 4000;
 
