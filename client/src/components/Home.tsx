@@ -46,7 +46,7 @@ const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
           event.target.files[0].name,
         );
         await axios
-          .post("http://localhost:4000/imgUpload", data, {
+          .post("http://http://3.36.93.32/imgUpload", data, {
             headers: { "Content-Type": "multipart/form-data;" },
           })
           .then((result) => {

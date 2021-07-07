@@ -9,3 +9,5 @@ router.post("/mediaPost", ImageUpload.uploadImageToS3);
 
 router.post("/dealers", Dealers.post);
 router.post("/dealerMedia", MediaPost.post);
+
+router.get("/test", Dealers.get);
