@@ -55,7 +55,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
         );
 
         await axios
-          .post("http://localhost:4000/mediaPost", data, {
+          .post("http://3.36.93.32/mediaPost", data, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
@@ -77,10 +77,8 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
             setMessage("File Uploaded");
           })
           .catch((error) => {
-            if (error.response.status === 500) {
+            if (error) {
               setMessage("There was a problem with the server");
-            } else {
-              setMessage(error.response.data.msg);
             }
             setUploadPercentage(0);
           });
@@ -91,6 +89,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
 
   const submitHandle = async (data: FormData) => {
     // console.log(data);
+
     let body = {
       fullname: userInfo.fullname,
       email: userInfo.email,
@@ -106,7 +105,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
 
     console.log("바디 : ", body);
 
-    await axios.post("http://localhost:4000/dealers", body).then((result) => {
+    await axios.post("http://3.36.93.32/dealers", body).then((result) => {
       if (result.data === "완료.") {
         setbIsEnd(true);
       }
