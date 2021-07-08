@@ -1,9 +1,9 @@
 version: "3"
 services:
   server:
-    image: hyundaiserver
+    image: h-festival
     container_name: h_festival_container
     ports:
-      - "80:80"
+      - "80:4000"
     env_file:
       - .env
