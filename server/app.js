@@ -38,12 +38,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: [
-      "https://h-festival-client.s3.ap-northeast-2.amazonaws.com/",
-      "http://localhost:3000",
-    ],
-    credentials: true,
-    methods: ["GET", "POST", "OPTIONS"],
+	  origin: ["http://h-festival-client.s3-website.ap-northeast-2.amazonaws.com"],
+	  credentials: true,
+	  methods: ["GET", "POST", "OPTIONS"],
   })
 );
 
