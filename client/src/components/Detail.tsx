@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import React, {useState} from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
@@ -34,14 +33,11 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
   const [message, setMessage] = useState("");
   const [uploadedFile, setUploadedFile] = useState<string>();
   const [bIsUpload, setbIsUpload] = useState<boolean>(false);
-  const history = useHistory();
+  const [fileName, setFileName] = useState<string>("");
 
   const MediaHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       let fileSize = event.target.files[0].size;
-
-      console.log(fileSize);
-
       if (fileSize > 524288000) {
         setMessage("Your image must be smaller than 500MB ");
         return;
@@ -53,9 +49,10 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
           event.target.files[0],
           event.target.files[0].name,
         );
+        setFileName(event.target.files[0].name);
 
         await axios
-          .post("http://3.36.93.32/mediaPost", data, {
+          .post("https://server.hmc-convention-2021.com/mediaPost", data, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
@@ -67,13 +64,8 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
           })
           .then((res) => {
             setTimeout(() => setUploadPercentage(0), 10000);
-
-            console.log(res);
-
             const { location } = res.data;
-
             setUploadedFile(location);
-
             setMessage("File Uploaded");
           })
           .catch((error) => {
@@ -88,28 +80,23 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
   };
 
   const submitHandle = async (data: FormData) => {
-    // console.log(data);
-
-    let body = {
-      fullname: userInfo.fullname,
-      email: userInfo.email,
-      mobile: userInfo.mobile,
-      picture: userInfo.picture,
-      region: userInfo.region,
-      country: userInfo.country,
-      sex: userInfo.sex,
-      mediaDest: uploadedFile,
-      description: data.Description,
-      selectedDest: data.selectedDestination,
-    };
-
-    console.log("바디 : ", body);
-
-    await axios.post("http://3.36.93.32/dealers", body).then((result) => {
-      if (result.data === "완료.") {
-        setbIsEnd(true);
-      }
-    });
+      let body = {
+        fullname: userInfo.fullname,
+        email: userInfo.email,
+        mobile: userInfo.mobile,
+        picture: userInfo.picture,
+        region: userInfo.region,
+        country: userInfo.country,
+        sex: userInfo.sex,
+        mediaDest: uploadedFile,
+        description: data.Description,
+        selectedDest: data.selectedDestination,
+      };
+      await axios.post("https://server.hmc-convention-2021.com/dealers", body).then((result) => {
+        if (result.data === "완료.") {
+          setbIsEnd(true);
+        }
+      });
   };
 
   return (
@@ -118,14 +105,17 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
         <Content>
           <Label>Upload your files</Label>
           <InputImage>
-            <Label htmlFor="fileUpload" size="16px" width="40px">
+            <FileName>
+              {fileName}
+            </FileName>
+            <Label htmlFor="fileUpload" size="16px" width="200px" item="center">
               . . .
             </Label>
             <Input
               formEncType="multipart/form-data"
               type="file"
               id="fileUpload"
-              accept="video/*"
+              // accept="video/*"
               onChange={(e) => MediaHandler(e)}
             />
           </InputImage>
@@ -207,7 +197,6 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
           <Button>Submit</Button>
         </ButtonBox>
       </Form>
-      {/* <FileUpload/> */}
     </Body>
   );
 };
@@ -221,20 +210,27 @@ const Body = styled.div`
   flex-direction: column;
 `;
 
-const Label = styled.label<{ size?: string; width?: string }>`
+const Label = styled.label<{ size?: string; width?: string; item?: string; }>`
+  display: flex;
   align-items: center;
+  flex-direction: ${(props) => (props.item ? 'row-reverse': 'none')};
+  cursor: ${(props) => (props.item ? 'pointer' : "none")};
   font-size: ${(props) => (props.size ? props.size : "inherit")};
   width: ${(props) => (props.width ? props.width : "auto")};
 `;
+
 
 const Input = styled.input``;
 
 const InputImage = styled.div`
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px;
   align-items: center;
   height: 35px;
   color: white;
+  font-size: 14px;
   border: solid 1px white;
   border-radius: 6px;
   background-color: rgba(0, 0, 0, 0);
@@ -307,4 +303,8 @@ const ProgressContainer = styled.div`
   border: 1px solid white;
   border-radius: 15px;
   align-items: center;
+`;
+
+const FileName = styled.div`
+  
 `;

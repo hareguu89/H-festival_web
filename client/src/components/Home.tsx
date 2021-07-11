@@ -28,7 +28,7 @@ const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
 
   const [imageFile, setImageFile] = useState<any>();
   const [bIsError, setbIsError] = useState(false);
-
+  const [fileName, setFileName] = useState<string>("");
   const emailRule = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
 
   const ImgHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,8 +45,10 @@ const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
           event.target.files[0],
           event.target.files[0].name,
         );
+        setFileName(event.target.files[0].name);
+        
         await axios
-          .post("http://http://3.36.93.32/imgUpload", data, {
+          .post("https://server.hmc-convention-2021.com/imgUpload", data, {
             headers: { "Content-Type": "multipart/form-data;" },
           })
           .then((result) => {
@@ -68,15 +70,7 @@ const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
       picture: imageFile,
       sex: data.sex,
     });
-
     setbIsUpdate(false);
-
-    // await axios.post("http://localhost:4000/dealers", body).then((result) => {
-    //   console.log(result);
-    //   if (result.data === "완료.") {
-    //     setbIsUpdate(false);
-    //   }
-    // });
   };
 
   return (
@@ -141,7 +135,10 @@ const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
           <Content>
             <Label>Upload profile picture</Label>
             <InputImage>
-              <Label htmlFor="fileUpload" size="16px" width="40px">
+              <FileName>
+                {fileName}
+              </FileName>
+              <Label htmlFor="fileUpload" size="16px" width="200px" item="center">
                 . . .
               </Label>
               <Input
@@ -264,8 +261,11 @@ const CheckBox = styled.div`
   margin-top: 15px;
 `;
 
-const Label = styled.label<{ size?: string; width?: string }>`
+const Label = styled.label<{ size?: string; width?: string; item?: string; }>`
+  display: flex;
   align-items: center;
+  flex-direction: ${(props) => (props.item ? 'row-reverse': 'none')};
+  cursor: ${(props) => (props.item ? 'pointer' : "none")};
   font-size: ${(props) => (props.size ? props.size : "inherit")};
   width: ${(props) => (props.width ? props.width : "auto")};
 `;
@@ -281,10 +281,13 @@ const Input = styled.input``;
 
 const InputImage = styled.div`
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px;
   align-items: center;
   height: 35px;
   color: white;
+  font-size: 14px;
   border: solid 1px white;
   border-radius: 6px;
   background-color: rgba(0, 0, 0, 0);
@@ -295,4 +298,8 @@ const Selection = styled.select``;
 const LabelCheck = styled.label`
   position: relative;
   /* left: 100px; */
+`;
+
+const FileName = styled.div`
+  
 `;

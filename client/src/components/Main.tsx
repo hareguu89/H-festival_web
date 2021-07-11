@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import Home from "./Home";
 import Detail from "./Detail";
-import hkhk from "../assets/hkhk.mp4";
-import humanity from "../assets/humanity.mp4";
 import Thanks from "./Thanks";
 
 export type userData = {
@@ -41,7 +39,7 @@ const Main = (): JSX.Element => {
           <Welcome>Metaverse Convention 2021</Welcome>
         </Header>
         {!bIsEnd ? (
-          bIsUpdate ? (
+          !bIsUpdate ? (
             <Home setbIsUpdate={setbIsUpdate} setUserInfo={setUserInfo} />
           ) : (
             <Detail userInfo={userInfo} setbIsEnd={setbIsEnd} />

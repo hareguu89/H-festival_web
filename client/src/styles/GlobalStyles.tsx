@@ -32,6 +32,7 @@ const globalStyles = createGlobalStyle`
         border-radius: 6px;
         background-color: rgba(0, 0, 0, 0);
         background-repeat: none;
+        padding: 10px;
     }
     input:focus{
         outline: none;
