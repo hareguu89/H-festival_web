@@ -1,3 +1,8 @@
+const size = {
+  mobile: "770px",
+  fontSizeRes: "10px",
+};
+
 const theme = {
   fontColors: {
     main: "white",
@@ -9,6 +14,8 @@ const theme = {
     white: "rgba(255, 255, 255, 0.3)",
   },
   image: "",
+  mobile: `(max-width: 770px)`,
+  fontSize: `(max-width: ${size.fontSizeRes})`,
 };
 
 export default theme;
