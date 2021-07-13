@@ -12,30 +12,31 @@ const s3 = new AWS.S3({
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: "h-festival", // 버킷 이름
+    bucket: "h-festival/images", // 버킷 이름
     contentType: multerS3.AUTO_CONTENT_TYPE, // 자동을 콘텐츠 타입 세팅
     acl: "public-read", // 클라이언트에서 자유롭게 가용하기 위함
     key: (req, file, cb) => {
       cb(null, file.originalname);
     },
   }),
-}).single("profileImage");
+}).array("profileImage", 10);
 
 module.exports = {
   uploadImageToS3: (req, res) => {
-    console.log(req.body);
     upload(req, res, (error) => {
       if (error) {
         res.json({ error: error });
       } else {
-        if (req.file === undefined) {
+        if (req.files === undefined) {
           res.json("Error: No File Selected");
         } else {
-          const imageName = req.file.key;
-          const imageLocation = req.file.location;
+          let locations = [];
+          let names = [];
+          for (let i = 0; i < req.files.length; i++) {
+            locations.push(req.files[i].location);
+          }
           res.json({
-            image: imageName,
-            location: imageLocation,
+            location: locations,
           });
         }
       }

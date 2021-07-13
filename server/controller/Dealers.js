@@ -1,4 +1,4 @@
-const { dealer } = require("../models");
+const { dealer, image } = require("../models");
 const sequelize = require("sequelize");
 const { Sequelize } = require("sequelize");
 const Op = sequelize.Op;
@@ -10,27 +10,37 @@ module.exports = {
     });
   },
   post: async (req, res) => {
-    console.log(req.body);
-    await dealer
-      .create({
-        name: req.body.fullname,
-        email: req.body.email,
-        mobile: req.body.mobile,
-        imgsrc: req.body.picture,
-        region: req.body.region,
-        country: req.body.country,
-        sex: req.body.sex,
-        mediaDest: req.body.mediaDest,
-        selectedDest: req.body.selectedDest,
-        description: req.body.description,
-      })
-      .then((data) => {
-        if (data) {
-          res.status(200).json("완료.");
-        }
-      })
-      .catch((error) => {
-        console.log(error);
+    let user = await dealer.create({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      region: req.body.region,
+      country: req.body.country,
+      sex: req.body.sex,
+      mediaDest: req.body.mediaDest,
+      selectedDest: req.body.selectedDest,
+      description: req.body.description,
+    });
+
+    let imgSrc = req.body.picture.src;
+
+    for (let i = 0; i < imgSrc.length; i++) {
+      await image.create({
+        dealerId: user.dataValues.id,
+        image: imgSrc[i],
       });
+    }
+
+    if (user && imageTable) {
+      res.status(200).json("완료.");
+    } else {
+      res.status(404).json("error");
+    }
+
+    // await dealer
+    //   .findOne({ where: { id: user.dataValues.id }, include: [image] })
+    //   .then((data) => {
+    //     res.status(200).json(data);
+    //   });
   },
 };

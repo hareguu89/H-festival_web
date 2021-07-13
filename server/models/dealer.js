@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      dealer.hasMany(models.image, { foreignKey: "dealerId", sourceKey: "id" });
     }
   }
 
@@ -21,12 +22,12 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      name: DataTypes.STRING(30),
+      firstName: DataTypes.STRING(30),
+      lastName: DataTypes.STRING(30),
       email: DataTypes.STRING(50),
       mobile: DataTypes.STRING,
-      imgsrc: DataTypes.STRING,
-      region: DataTypes.STRING(30),
-      country: DataTypes.STRING(30),
+      region: DataTypes.STRING(60),
+      country: DataTypes.STRING(60),
       sex: DataTypes.STRING(30),
       mediaDest: DataTypes.STRING,
       selectedDest: DataTypes.STRING,

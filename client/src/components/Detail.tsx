@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
@@ -12,7 +12,8 @@ type FormData = {
 
 interface info {
   userInfo: {
-    fullname: string;
+    firstName: string;
+    lastName: string;
     email: string;
     mobile: string;
     picture: string;
@@ -34,6 +35,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
   const [uploadedFile, setUploadedFile] = useState<string>();
   const [bIsUpload, setbIsUpload] = useState<boolean>(false);
   const [fileName, setFileName] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   const MediaHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -52,7 +54,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
         setFileName(event.target.files[0].name);
 
         await axios
-          .post("https://server.hmc-convention-2021.com/mediaPost", data, {
+          .post("https://hmc-convention-2021.com/mediaPost", data, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
@@ -80,8 +82,12 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
   };
 
   const submitHandle = async (data: FormData) => {
+    if (!uploadedFile) {
+      setError("Video file is required. Please, check your uploaded file.");
+    } else {
       let body = {
-        fullname: userInfo.fullname,
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
         email: userInfo.email,
         mobile: userInfo.mobile,
         picture: userInfo.picture,
@@ -92,11 +98,14 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
         description: data.Description,
         selectedDest: data.selectedDestination,
       };
-      await axios.post("https://server.hmc-convention-2021.com/dealers", body).then((result) => {
-        if (result.data === "완료.") {
-          setbIsEnd(true);
-        }
-      });
+      await axios
+        .post("https://hmc-convention-2021.com/dealers", body)
+        .then((result) => {
+          if (result.data === "완료.") {
+            setbIsEnd(true);
+          }
+        });
+    }
   };
 
   return (
@@ -105,9 +114,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
         <Content>
           <Label>Upload your files</Label>
           <InputImage>
-            <FileName>
-              {fileName}
-            </FileName>
+            <FileName>{fileName}</FileName>
             <Label htmlFor="fileUpload" size="16px" width="200px" item="center">
               . . .
             </Label>
@@ -115,7 +122,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
               formEncType="multipart/form-data"
               type="file"
               id="fileUpload"
-              // accept="video/*"
+              accept="video/*"
               onChange={(e) => MediaHandler(e)}
             />
           </InputImage>
@@ -134,7 +141,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
 
         <CheckBox>
           <LabelCheck>
-            <span>H-Story</span>
+            <Span>H-Story</Span>
           </LabelCheck>
           <LabelCheck className="box-radio-input">
             <Input
@@ -147,7 +154,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
           </LabelCheck>
 
           <LabelCheck>
-            <span>H-Travel</span>
+            <Span>H-Travel</Span>
           </LabelCheck>
           <LabelCheck className="box-radio-input">
             <Input
@@ -160,7 +167,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
           </LabelCheck>
 
           <LabelCheck>
-            <span>H-Gather</span>
+            <Span>H-Gather</Span>
           </LabelCheck>
           <LabelCheck className="box-radio-input">
             <Input
@@ -196,6 +203,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
         <ButtonBox>
           <Button>Submit</Button>
         </ButtonBox>
+        <Error>{error}</Error>
       </Form>
     </Body>
   );
@@ -208,20 +216,34 @@ const Body = styled.div`
   gap: 20px;
   width: 550px;
   flex-direction: column;
+  @media only screen and (max-width: 770px) {
+    width: 320px;
+    font-size: 10px;
+    gap: 10px;
+  }
 `;
 
-const Label = styled.label<{ size?: string; width?: string; item?: string; }>`
+const Label = styled.label<{ size?: string; width?: string; item?: string }>`
   display: flex;
   align-items: center;
-  flex-direction: ${(props) => (props.item ? 'row-reverse': 'none')};
-  cursor: ${(props) => (props.item ? 'pointer' : "none")};
+  flex-direction: ${(props) => (props.item ? "row-reverse" : "none")};
+  cursor: ${(props) => (props.item ? "pointer" : "none")};
   font-size: ${(props) => (props.size ? props.size : "inherit")};
   width: ${(props) => (props.width ? props.width : "auto")};
-`;
 
+  @media only screen and (max-width: 770px) {
+    width: ${(props) => (props.width ? props.width : "320px")};
+    font-size: 15px;
+  }
+`;
 
 const Input = styled.input``;
 
+const Span = styled.span`
+  @media only screen and (max-width: 770px) {
+    font-size: 15px;
+  }
+`;
 const InputImage = styled.div`
   display: flex;
   flex-direction: row;
@@ -234,6 +256,11 @@ const InputImage = styled.div`
   border: solid 1px white;
   border-radius: 6px;
   background-color: rgba(0, 0, 0, 0);
+  @media (max-width: 770px) {
+    width: 320px;
+    font-size: 10px;
+    height: 25px;
+  }
 `;
 
 const Content = styled.div`
@@ -253,6 +280,10 @@ const CheckBox = styled.div`
   gap: 10px;
   width: 550px;
   margin-bottom: 10px;
+  @media only screen and (max-width: 770px) {
+    width: 320px;
+    margin-bottom: 0;
+  }
 `;
 
 const Error = styled.div`
@@ -272,17 +303,28 @@ const Textarea = styled.textarea`
   &:focus {
     outline: none;
   }
+  @media only screen and (max-width: 770px) {
+    width: 320px;
+    height: 150px;
+    font-size: 10px;
+  }
 `;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 20px;
+  @media only screen and (max-width: 770px) {
+    gap: 10px;
+  }
 `;
 
 const ButtonBox = styled.div`
+  margin-top: 30px;
   display: flex;
-  width: 550px;
+  @media only screen and (max-width: 770px) {
+    margin-top: 20px;
+  }
 `;
 
 const Button = styled.button`
@@ -294,6 +336,13 @@ const Button = styled.button`
   border-radius: 6px;
   background-color: rgba(0, 0, 0, 0);
   cursor: pointer;
+
+  @media only screen and (max-width: 770px) {
+    width: 50px;
+    height: 25px;
+    font-size: 12px;
+    padding: 0;
+  }
 `;
 
 const ProgressContainer = styled.div`
@@ -305,6 +354,4 @@ const ProgressContainer = styled.div`
   align-items: center;
 `;
 
-const FileName = styled.div`
-  
-`;
+const FileName = styled.div``;
