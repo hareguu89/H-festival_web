@@ -27,14 +27,16 @@ module.exports = {
       if (error) {
         res.json({ error: error });
       } else {
-        if (req.file === undefined) {
+        if (req.files === undefined) {
           res.json("Error: No File Selected");
         } else {
-          const imageName = req.file.key;
-          const imageLocation = req.file.location;
+          let locations = [];
+          let names = [];
+          for (let i = 0; i < req.files.length; i++) {
+            locations.push(req.files[i].location);
+          }
           res.json({
-            image: imageName,
-            location: imageLocation,
+            location: locations,
           });
         }
       }
