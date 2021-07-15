@@ -90,7 +90,8 @@ const MainContainer = styled.article`
   justify-content: center;
   align-items: center;
   gap: 30px;
-  margin: 50px;
+  margin-top: 50px;
+  overflow: hidden;
 `;
 
 const Header = styled.header`
@@ -118,14 +119,12 @@ const Source = styled.source`
   height: 100%;
 `;
 const Video = styled.video`
-  position: absolute;
+  display: block;
+  position: fixed;
   width: 100%;
   height: 100%;
-  top: 0%;
+  top: 0;
+  left: 0;
   object-fit: cover;
   z-index: -1;
-  @media (max-width: 768px) {
-    width: 320px;
-    height: auto;
-  }
 `;

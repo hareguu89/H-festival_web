@@ -24,6 +24,10 @@ interface info {
   setbIsEnd: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+type TObj = {
+  src: {};
+};
+
 const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
   const {
     register,
@@ -32,80 +36,76 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
   } = useForm<FormData>();
   const [uploadPercentage, setUploadPercentage] = useState<number>(0);
   const [message, setMessage] = useState("");
-  const [uploadedFile, setUploadedFile] = useState<string>();
+  const [uploadedFile, setUploadedFile] = useState<TObj>({ src: {} });
   const [bIsUpload, setbIsUpload] = useState<boolean>(false);
   const [fileName, setFileName] = useState<string>("");
   const [error, setError] = useState<string>("");
 
   const MediaHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      let fileSize = event.target.files[0].size;
-      if (fileSize > 524288000) {
-        setMessage("Your image must be smaller than 500MB ");
-        return;
-      } else {
-        setbIsUpload(true);
-        const data = new FormData();
+      setbIsUpload(true);
+      const data = new FormData();
+
+      for (let i = 0; i < event.target.files.length; i++) {
         data.append(
           "profileImage",
-          event.target.files[0],
-          event.target.files[0].name,
+          event.target.files[i],
+          event.target.files[i].name,
         );
-        setFileName(event.target.files[0].name);
-
-        await axios
-          .post("https://hmc-convention-2021.com/mediaPost", data, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            onUploadProgress: (progressEvent) => {
-              let a = Number(progressEvent.loaded) * 100;
-              let percentage = Math.round(a / progressEvent.total);
-              setUploadPercentage(parseInt(String(percentage)));
-            },
-          })
-          .then((res) => {
-            setTimeout(() => setUploadPercentage(0), 10000);
-            const { location } = res.data;
-            setUploadedFile(location);
-            setMessage("File Uploaded");
-          })
-          .catch((error) => {
-            if (error) {
-              setMessage("There was a problem with the server");
-            }
-            setUploadPercentage(0);
-          });
       }
+
+      setFileName(event.target.files[0].name);
+
+      await axios
+        .post("https://server.hmc-convention-2021.com/mediaPost", data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            let a = Number(progressEvent.loaded) * 100;
+            let percentage = Math.round(a / progressEvent.total);
+            setUploadPercentage(parseInt(String(percentage)));
+          },
+        })
+        .then((res) => {
+          setTimeout(() => setUploadPercentage(0), 10000);
+          if (res.data.location) {
+            uploadedFile.src = res.data.location;
+            setMessage("File Uploaded");
+          }
+        })
+        .catch((error) => {
+          if (error) {
+            setMessage("There was a problem with the server");
+          }
+          setUploadPercentage(0);
+        });
     }
     setbIsUpload(false);
   };
 
   const submitHandle = async (data: FormData) => {
-    if (!uploadedFile) {
-      setError("Video file is required. Please, check your uploaded file.");
-    } else {
-      let body = {
-        firstName: userInfo.firstName,
-        lastName: userInfo.lastName,
-        email: userInfo.email,
-        mobile: userInfo.mobile,
-        picture: userInfo.picture,
-        region: userInfo.region,
-        country: userInfo.country,
-        sex: userInfo.sex,
-        mediaDest: uploadedFile,
-        description: data.Description,
-        selectedDest: data.selectedDestination,
-      };
-      await axios
-        .post("https://hmc-convention-2021.com/dealers", body)
-        .then((result) => {
-          if (result.data === "완료.") {
-            setbIsEnd(true);
-          }
-        });
-    }
+    let body = {
+      firstName: userInfo.firstName,
+      lastName: userInfo.lastName,
+      email: userInfo.email,
+      mobile: userInfo.mobile,
+      picture: userInfo.picture,
+      region: userInfo.region,
+      country: userInfo.country,
+      sex: userInfo.sex,
+      mediaDest: uploadedFile,
+      description: data.Description,
+      selectedDest: data.selectedDestination,
+    };
+    await axios
+      .post("https://server.hmc-convention-2021.com/dealers", body)
+      .then((result) => {
+        console.log(result.data);
+        if (result.data === "완료.") {
+          setbIsEnd(true);
+        }
+      });
   };
 
   return (
@@ -122,7 +122,8 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
               formEncType="multipart/form-data"
               type="file"
               id="fileUpload"
-              accept="video/*"
+              multiple
+              // accept="video/*"
               onChange={(e) => MediaHandler(e)}
             />
           </InputImage>
@@ -154,19 +155,19 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
           </LabelCheck>
 
           <LabelCheck>
-            <Span>H-Travel</Span>
+            <Span>H-Traveler</Span>
           </LabelCheck>
           <LabelCheck className="box-radio-input">
             <Input
               type="radio"
               id="story"
-              value="H-Travel"
+              value="H-Traveler"
               {...register("selectedDestination", { required: true })}
             ></Input>
             <span></span>
           </LabelCheck>
 
-          <LabelCheck>
+          {/* <LabelCheck>
             <Span>H-Gather</Span>
           </LabelCheck>
           <LabelCheck className="box-radio-input">
@@ -177,7 +178,7 @@ const Detail = ({ userInfo, setbIsEnd }: info): JSX.Element => {
               {...register("selectedDestination", { required: true })}
             ></Input>
             <span></span>
-          </LabelCheck>
+          </LabelCheck> */}
         </CheckBox>
 
         <Error>
@@ -352,6 +353,10 @@ const ProgressContainer = styled.div`
   border: 1px solid white;
   border-radius: 15px;
   align-items: center;
+  @media only screen and (max-width: 770px) {
+    width: 320px;
+    height: 15px;
+  }
 `;
 
 const FileName = styled.div``;

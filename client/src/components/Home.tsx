@@ -60,7 +60,7 @@ const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
         }
         setFileName(event.target.files[0].name);
         await axios
-          .post("https://hmc-convention-2021.com/imgUpload", data, {
+          .post("https://server.hmc-convention-2021.com/imgUpload", data, {
             headers: { "Content-Type": "multipart/form-data;" },
           })
           .then((result) => {
@@ -106,7 +106,6 @@ const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
                 id="fname"
                 {...register("firstName", {
                   required: true,
-                  minLength: 2,
                   maxLength: 20,
                 })}
               />
@@ -124,7 +123,7 @@ const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
                 id="fname"
                 {...register("lastName", {
                   required: true,
-                  minLength: 2,
+                  minLength: 1,
                   maxLength: 20,
                 })}
               />
@@ -169,7 +168,7 @@ const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
                 type="text"
                 id="mobile"
                 {...register("mobile", {
-                  required: true,
+                  // required: true,
                   minLength: 8,
                   valueAsNumber: true,
                   pattern: mobileRule,
@@ -220,25 +219,27 @@ const Home = ({ setbIsUpdate, setUserInfo }: Iprops): JSX.Element => {
               <option value="Hyundai Motor North America Headquarters">
                 Hyundai Motor North America Headquarters
               </option>
-              <option value="Hyundai Motor Central & South America Headquarters">
+              <option value="Hyundai Motor Central & South America Headquarter">
                 Hyundai Motor Central & South America Headquarters
               </option>
-              <option value="Hyundai Motor Europe Headquarters">
-                Hyundai Motor Europe Headquarters
+              <option value="Hyundai Motor Europe Headquarter">
+                Hyundai Motor Europe Headquarter
               </option>
-              <option value="Hyundai Asia Pacific Headquarters">
-                Hyundai Asia Pacific Headquarters
+              <option value="Hyundai Motor Asia Pacific Headquarter">
+                Hyundai Motor Asia Pacific Headquarters
               </option>
-              <option value="Hyundai M.East & Africa Headquarters">
-                Hyundai M.East & Africa Headquarters
+              <option value="Hyundai Motor M.East & Africa Headquarter">
+                Hyundai Motor M.East & Africa Headquarters
               </option>
-              <option value="Hyundai Russia & CIS Headquarters">
-                Hyundai Russia & CIS Headquarters
+              <option value="Hyundai Motor Russia & CIS Headquarter">
+                Hyundai Motor Russia & CIS Headquarters
               </option>
-              <option value="Hyundai India Headquarters">
-                Hyundai India Headquarters
+              <option value="Hyundai Motor India Headquarter">
+                Hyundai Motor India Headquarters
               </option>
-              <option value="China Operations">China Operations</option>
+              <option value="China Operations">
+                Beijing Hyundai Motor Company
+              </option>
             </Selection>
             <Error>
               {errors.region?.type === "required" && "Please select options."}
@@ -698,6 +699,10 @@ const NumberInput = styled.input`
 const NumberSelect = styled.select`
   border: none;
   width: 40%;
+  @media only screen and (max-width: 770px) {
+    /* width: 320px; */
+    font-size: 10px;
+  }
 `;
 
 const CodeNumber = styled.div`
