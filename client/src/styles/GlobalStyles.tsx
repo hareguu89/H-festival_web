@@ -23,13 +23,13 @@ const globalStyles = createGlobalStyle`
         font-weight: 50;
         font-family: 'Hyundai Sans Text Office';
         color: white;
-        background-color: white;
+        background-color: black;
         
         @media only screen and (max-width: 1024px) {
             width: 100%;
             height: 100%;
             background-image: url(${MobileGIF});
-            background-size: 100% auto;
+            background-size: 100% 100%;
             background-repeat: no-repeat;
         }
     }
